@@ -9,9 +9,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ShieldCheck, Lock, BadgeCheck } from 'lucide-react';
+import { ShieldCheck, Lock, BadgeCheck, Loader2, Mail } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContextCheckout';
 import { toast } from 'sonner';
+import { Separator } from '@/components/ui/separator';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -24,38 +25,77 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otp, setOtp] = useState('');
   const [acceptUpdates, setAcceptUpdates] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
 
-  const handleSendOTP = () => {
+  const handleSendOTP = async () => {
     if (phoneNumber.length !== 10) {
       toast.error('Please enter a valid 10-digit mobile number');
       return;
     }
-    toast.success('OTP sent to your mobile number!');
-    setStep('otp');
+    
+    setIsLoading(true);
+    
+    // Simulate API call delay
+    setTimeout(() => {
+      setIsLoading(false);
+      toast.success(`OTP sent to +91 ${phoneNumber}`, {
+        description: 'Demo Mode: Use any 6-digit code to login'
+      });
+      setStep('otp');
+    }, 1500);
   };
 
-  const handleVerifyOTP = () => {
+  const handleVerifyOTP = async () => {
     if (otp.length !== 6) {
       toast.error('Please enter a valid 6-digit OTP');
       return;
     }
-    // Frontend only - accept any 6-digit OTP
-    login(`+91${phoneNumber}`);
-    toast.success('Login successful!');
-    onSuccess();
-    onClose();
-    // Reset state
-    setStep('phone');
-    setPhoneNumber('');
-    setOtp('');
+    
+    setIsLoading(true);
+    
+    // Simulate API verification delay
+    setTimeout(() => {
+      setIsLoading(false);
+      login(`+91${phoneNumber}`);
+      toast.success('Login successful! 🎉', {
+        description: 'Welcome to Plant Haven'
+      });
+      onSuccess();
+      onClose();
+      // Reset state
+      setStep('phone');
+      setPhoneNumber('');
+      setOtp('');
+    }, 1000);
+  };
+
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+    
+    // Simulate Google OAuth flow
+    setTimeout(() => {
+      setIsLoading(false);
+      login('google_user@gmail.com');
+      toast.success('Google login successful! 🎉', {
+        description: 'Welcome to Plant Haven'
+      });
+      onSuccess();
+      onClose();
+      // Reset state
+      setStep('phone');
+      setPhoneNumber('');
+      setOtp('');
+    }, 1500);
   };
 
   const handleClose = () => {
-    setStep('phone');
-    setPhoneNumber('');
-    setOtp('');
-    onClose();
+    if (!isLoading) {
+      setStep('phone');
+      setPhoneNumber('');
+      setOtp('');
+      onClose();
+    }
   };
 
   return (
@@ -69,7 +109,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
               </div>
               <div>
                 <DialogTitle className="text-2xl font-black">Login to continue</DialogTitle>
-                <p className="text-sm text-muted-foreground mt-1">Secure checkout with mobile verification</p>
+                <p className="text-sm text-muted-foreground mt-1">Secure checkout with verification</p>
               </div>
             </div>
           </DialogHeader>
@@ -78,6 +118,29 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
         <div className="p-8 space-y-6">
           {step === 'phone' ? (
             <>
+              {/* Google Login Option */}
+              <Button
+                onClick={handleGoogleLogin}
+                disabled={isLoading}
+                variant="outline"
+                className="w-full h-14 rounded-xl text-lg font-bold border-2 hover:bg-muted transition-all"
+              >
+                {isLoading ? (
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                ) : (
+                  <Mail className="w-5 h-5 mr-2" />
+                )}
+                Continue with Google
+              </Button>
+
+              <div className="relative">
+                <Separator className="my-6" />
+                <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background px-4 text-sm text-muted-foreground font-bold">
+                  OR
+                </span>
+              </div>
+
+              {/* Mobile Login */}
               <div className="space-y-3">
                 <Label htmlFor="phone" className="text-base font-bold">Enter Mobile Number</Label>
                 <div className="flex gap-2">
@@ -92,8 +155,17 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
                     onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
                     className="flex-1 h-14 text-lg rounded-xl border-2 focus-visible:ring-primary"
                     maxLength={10}
+                    disabled={isLoading}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && phoneNumber.length === 10) {
+                        handleSendOTP();
+                      }
+                    }}
                   />
                 </div>
+                <p className="text-xs text-muted-foreground italic">
+                  Demo Mode: Any 10-digit number works
+                </p>
               </div>
 
               <div className="flex items-start gap-3">
@@ -102,6 +174,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
                   checked={acceptUpdates}
                   onCheckedChange={(checked) => setAcceptUpdates(checked as boolean)}
                   className="mt-1"
+                  disabled={isLoading}
                 />
                 <label htmlFor="updates" className="text-sm text-muted-foreground leading-relaxed cursor-pointer">
                   Send me order updates & offers - (no spam)
@@ -111,9 +184,16 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
               <Button
                 onClick={handleSendOTP}
                 className="w-full h-14 rounded-xl text-lg font-black"
-                disabled={phoneNumber.length !== 10}
+                disabled={phoneNumber.length !== 10 || isLoading}
               >
-                Send OTP
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Sending OTP...
+                  </>
+                ) : (
+                  'Send OTP'
+                )}
               </Button>
             </>
           ) : (
@@ -131,29 +211,51 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
                   onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   className="h-14 text-2xl text-center tracking-[0.5em] rounded-xl border-2 focus-visible:ring-primary font-bold"
                   maxLength={6}
+                  disabled={isLoading}
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && otp.length === 6) {
+                      handleVerifyOTP();
+                    }
+                  }}
                 />
+                <p className="text-xs text-muted-foreground italic text-center">
+                  Demo Mode: Enter any 6-digit code
+                </p>
               </div>
 
               <div className="flex gap-3">
                 <Button
                   variant="outline"
-                  onClick={() => setStep('phone')}
+                  onClick={() => {
+                    setStep('phone');
+                    setOtp('');
+                  }}
                   className="flex-1 h-14 rounded-xl text-lg font-bold border-2"
+                  disabled={isLoading}
                 >
                   Change Number
                 </Button>
                 <Button
                   onClick={handleVerifyOTP}
                   className="flex-1 h-14 rounded-xl text-lg font-black"
-                  disabled={otp.length !== 6}
+                  disabled={otp.length !== 6 || isLoading}
                 >
-                  Verify & Continue
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Verifying...
+                    </>
+                  ) : (
+                    'Verify & Continue'
+                  )}
                 </Button>
               </div>
 
               <button
                 onClick={handleSendOTP}
-                className="w-full text-center text-sm text-primary font-bold hover:underline"
+                className="w-full text-center text-sm text-primary font-bold hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isLoading}
               >
                 Resend OTP
               </button>
@@ -162,7 +264,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
 
           {/* Security Badges */}
           <div className="pt-6 border-t">
-            <div className="flex items-center justify-center gap-6 text-xs text-muted-foreground">
+            <div className="flex items-center justify-center gap-6 text-xs text-muted-foreground flex-wrap">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-primary" />
                 <span>PCI DSS Certified</span>

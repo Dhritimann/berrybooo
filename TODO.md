@@ -36,6 +36,14 @@
   - [x] Add Coupon system with discount calculation
   - [x] Add Address form
   - [x] Integrate authentication flow
+- [x] Bug Fixes & Improvements
+  - [x] Fix React Context error (moved providers to App level)
+  - [x] Improve Login Modal with loading states and error handling
+  - [x] Add Google/Gmail login option
+  - [x] Enhance Cart UI with better visibility and layout
+  - [x] Add item total calculations in cart
+  - [x] Improve cart responsiveness and spacing
+  - [x] Add demo mode indicators for OTP login
 
 ## Notes
 - User requested "Vanilla JS" feel but the environment is React. I will use React with a clean architecture.
@@ -46,3 +54,6 @@
 - Payment page includes all modern ecommerce features: coupons, address, payment methods
 - All data persists in localStorage (cart and auth state)
 - Razorpay integration structure ready for API key addition
+- Login modal now includes loading states, error handling, and Google login option
+- Cart UI significantly improved with better product visibility, clear pricing, and item totals
+- Demo mode clearly indicated for OTP verification (frontend-only implementation)
