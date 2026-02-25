@@ -1,0 +1,48 @@
+# Task: Build Plant Haven Landing Page
+
+## Plan
+- [x] Initialize Project Structure & Design Tokens
+  - [x] Configure `tailwind.config.js` with soft green palette
+  - [x] Update `src/index.css` with semantic variables and global styles
+- [x] Define Product Data
+  - [x] Create `src/data/products.ts` with categories and plant data
+- [x] Develop Reusable Components
+  - [x] `Navbar`: Sticky with smooth scroll
+  - [x] `ProductCard`: Premium card with hover effects
+  - [x] `CategorySection`: Grid with "View All" toggle
+  - [x] `Newsletter`: Subscription UI
+  - [x] `Footer`: Site information
+- [x] Build Main Landing Page
+  - [x] `Hero`: Impactful visual section
+  - [x] `WhyChooseUs`: Value proposition
+  - [x] `Testimonials`: Customer trust
+  - [x] Assemble all sections in `src/pages/Home.tsx`
+- [x] Routing & Navigation
+  - [x] Update `src/routes.tsx` to include Home and redirect root
+  - [x] Ensure smooth scrolling for navigation links
+- [x] Final Polish
+  - [x] Add scroll animations (Fade-in)
+  - [x] Run `npm run lint` and fix issues
+- [x] Upgrade to Full Ecommerce
+  - [x] Add Cart System with localStorage persistence
+  - [x] Add Product Modal for quick view
+  - [x] Add Hero Slider with auto-play
+  - [x] Upgrade Navbar with Cart button and counter
+- [x] Checkout & Payment Flow
+  - [x] Fix cart rendering issues
+  - [x] Add Login Modal with mobile OTP
+  - [x] Create Checkout Page with order summary
+  - [x] Add Payment Methods (Razorpay, UPI, Card, Net Banking, COD)
+  - [x] Add Coupon system with discount calculation
+  - [x] Add Address form
+  - [x] Integrate authentication flow
+
+## Notes
+- User requested "Vanilla JS" feel but the environment is React. I will use React with a clean architecture.
+- "View All" should expand products inline.
+- Soft green palette is primary.
+- Cart now properly displays all items with images, names, prices, and quantities
+- Login flow integrated with checkout - users must login before proceeding
+- Payment page includes all modern ecommerce features: coupons, address, payment methods
+- All data persists in localStorage (cart and auth state)
+- Razorpay integration structure ready for API key addition
