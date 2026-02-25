@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/contexts/AuthContextCheckout';
 import { generateOTP, sendOTPEmail } from '@/utils/emailService';
+import { cn } from '@/lib/utils';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -29,15 +30,17 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
   const [generatedOTP, setGeneratedOTP] = useState('');
   const [acceptUpdates, setAcceptUpdates] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [loginMethod, setLoginMethod] = useState<'phone' | 'email'>('email');
   const { login } = useAuth();
 
   const handleSendOTP = async () => {
-    if (phoneNumber.length !== 10) {
+    // Validate based on login method
+    if (loginMethod === 'phone' && phoneNumber.length !== 10) {
       toast.error('Please enter a valid 10-digit mobile number');
       return;
     }
 
-    if (!email || !email.includes('@')) {
+    if (loginMethod === 'email' && (!email || !email.includes('@'))) {
       toast.error('Please enter a valid email address');
       return;
     }
@@ -48,21 +51,29 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
     const newOTP = generateOTP();
     setGeneratedOTP(newOTP);
     
-    // Send OTP to email
-    const emailResult = await sendOTPEmail(email, `+91${phoneNumber}`, newOTP);
-    
-    setIsLoading(false);
-    
-    if (emailResult.success) {
-      toast.success(`OTP sent to ${email}`, {
-        description: `Check your email for the 6-digit code. OTP: ${newOTP}`
-      });
-      setStep('otp');
+    // Send OTP to email if email is provided
+    if (loginMethod === 'email' && email) {
+      const emailResult = await sendOTPEmail(email, phoneNumber || 'N/A', newOTP);
+      
+      setIsLoading(false);
+      
+      if (emailResult.success) {
+        toast.success(`OTP sent to ${email}`, {
+          description: `Check your email for the 6-digit code. Demo OTP: ${newOTP}`
+        });
+        setStep('otp');
+      } else {
+        toast.info('Demo Mode - OTP Generated', {
+          description: `Email service not configured. Use OTP: ${newOTP}`
+        });
+        setStep('otp');
+      }
     } else {
-      toast.error('Failed to send OTP', {
-        description: emailResult.message + ` Demo OTP: ${newOTP}`
+      // Phone login - show OTP directly
+      setIsLoading(false);
+      toast.success(`OTP sent to +91 ${phoneNumber}`, {
+        description: `Demo Mode - Use OTP: ${newOTP}`
       });
-      // Still allow to proceed in demo mode
       setStep('otp');
     }
   };
@@ -76,7 +87,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
     // Verify OTP matches
     if (otp !== generatedOTP) {
       toast.error('Invalid OTP', {
-        description: 'Please enter the correct OTP sent to your email'
+        description: 'Please enter the correct OTP'
       });
       return;
     }
@@ -86,8 +97,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
     // Simulate API verification delay
     setTimeout(() => {
       setIsLoading(false);
-      // Store email in auth context
-      login(email);
+      // Store email or phone in auth context
+      const identifier = loginMethod === 'email' ? email : `+91${phoneNumber}`;
+      login(identifier);
       toast.success('Login successful! 🎉', {
         description: 'Welcome to BerryBooo'
       });
@@ -175,52 +187,87 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
                 </span>
               </div>
 
-              {/* Email Input */}
-              <div className="space-y-3">
-                <Label htmlFor="email" className="text-base font-bold">Email Address *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="your.email@gmail.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="h-14 text-lg rounded-xl border-2 focus-visible:ring-primary"
-                  disabled={isLoading}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && email && phoneNumber.length === 10) {
-                      handleSendOTP();
-                    }
-                  }}
-                />
-                <p className="text-xs text-muted-foreground">
-                  OTP will be sent to this email address
-                </p>
+              {/* Login Method Tabs */}
+              <div className="flex gap-2 p-1 bg-muted rounded-xl">
+                <button
+                  onClick={() => setLoginMethod('email')}
+                  className={cn(
+                    "flex-1 py-3 rounded-lg font-bold transition-all",
+                    loginMethod === 'email' 
+                      ? "bg-primary text-white shadow-md" 
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  Email Login
+                </button>
+                <button
+                  onClick={() => setLoginMethod('phone')}
+                  className={cn(
+                    "flex-1 py-3 rounded-lg font-bold transition-all",
+                    loginMethod === 'phone' 
+                      ? "bg-primary text-white shadow-md" 
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  Phone Login
+                </button>
               </div>
 
-              {/* Mobile Login */}
-              <div className="space-y-3">
-                <Label htmlFor="phone" className="text-base font-bold">Mobile Number *</Label>
-                <div className="flex gap-2">
-                  <div className="w-20 h-14 rounded-xl bg-muted flex items-center justify-center font-bold text-lg border-2 border-border">
-                    +91
-                  </div>
+              {/* Email Login */}
+              {loginMethod === 'email' && (
+                <div className="space-y-3">
+                  <Label htmlFor="email" className="text-base font-bold">Email Address *</Label>
                   <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="9876543210"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                    className="flex-1 h-14 text-lg rounded-xl border-2 focus-visible:ring-primary"
-                    maxLength={10}
+                    id="email"
+                    type="email"
+                    placeholder="your.email@gmail.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="h-14 text-lg rounded-xl border-2 focus-visible:ring-primary"
                     disabled={isLoading}
+                    autoFocus
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter' && email && phoneNumber.length === 10) {
+                      if (e.key === 'Enter' && email) {
                         handleSendOTP();
                       }
                     }}
                   />
+                  <p className="text-xs text-muted-foreground">
+                    OTP will be sent to this email address
+                  </p>
                 </div>
-              </div>
+              )}
+
+              {/* Mobile Login */}
+              {loginMethod === 'phone' && (
+                <div className="space-y-3">
+                  <Label htmlFor="phone" className="text-base font-bold">Mobile Number *</Label>
+                  <div className="flex gap-2">
+                    <div className="w-20 h-14 rounded-xl bg-muted flex items-center justify-center font-bold text-lg border-2 border-border">
+                      +91
+                    </div>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="9876543210"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                      className="flex-1 h-14 text-lg rounded-xl border-2 focus-visible:ring-primary"
+                      maxLength={10}
+                      disabled={isLoading}
+                      autoFocus
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && phoneNumber.length === 10) {
+                          handleSendOTP();
+                        }
+                      }}
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    OTP will be sent to this number (Demo Mode)
+                  </p>
+                </div>
+              )}
 
               <div className="flex items-start gap-3">
                 <Checkbox
@@ -238,7 +285,11 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
               <Button
                 onClick={handleSendOTP}
                 className="w-full h-14 rounded-xl text-lg font-black"
-                disabled={phoneNumber.length !== 10 || !email || isLoading}
+                disabled={
+                  (loginMethod === 'email' && !email) || 
+                  (loginMethod === 'phone' && phoneNumber.length !== 10) || 
+                  isLoading
+                }
               >
                 {isLoading ? (
                   <>
@@ -246,7 +297,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
                     Sending OTP...
                   </>
                 ) : (
-                  'Send OTP to Email'
+                  `Send OTP to ${loginMethod === 'email' ? 'Email' : 'Phone'}`
                 )}
               </Button>
             </>
@@ -255,7 +306,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
               <div className="space-y-3">
                 <Label htmlFor="otp" className="text-base font-bold">Enter OTP</Label>
                 <p className="text-sm text-muted-foreground">
-                  We've sent a 6-digit code to {email}
+                  We've sent a 6-digit code to {loginMethod === 'email' ? email : `+91 ${phoneNumber}`}
                 </p>
                 <Input
                   id="otp"
@@ -274,7 +325,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
                   }}
                 />
                 <p className="text-xs text-primary font-bold text-center">
-                  Check your email inbox for the OTP
+                  {loginMethod === 'email' ? 'Check your email inbox for the OTP' : 'Check the toast notification for demo OTP'}
                 </p>
               </div>
 
@@ -289,7 +340,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
                   className="flex-1 h-14 rounded-xl text-lg font-bold border-2"
                   disabled={isLoading}
                 >
-                  Change Email
+                  Change {loginMethod === 'email' ? 'Email' : 'Number'}
                 </Button>
                 <Button
                   onClick={handleVerifyOTP}

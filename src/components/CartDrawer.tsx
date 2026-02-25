@@ -47,6 +47,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     return priceValue * quantity;
   };
 
+  // Calculate shipping cost
+  const shippingCost = subtotal >= 499 ? 0 : 50;
+  const grandTotal = subtotal + shippingCost;
+
   return (
     <>
       <Sheet open={isOpen} onOpenChange={onClose}>
@@ -64,17 +68,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                   </p>
                 </div>
               </div>
-              <button 
-                onClick={onClose} 
-                className="p-2 hover:bg-white/50 rounded-full transition-colors"
-                aria-label="Close cart"
-              >
-                <X className="w-6 h-6" />
-              </button>
             </div>
           </SheetHeader>
 
-          <ScrollArea className="flex-1 p-6 md:p-8">
+          <ScrollArea className="flex-1 p-6 md:p-8 max-h-[calc(100vh-400px)]">
             {cartItems.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 md:py-24 text-center space-y-6">
                 <div className="w-32 h-32 rounded-full bg-muted flex items-center justify-center">
@@ -181,10 +178,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
           </ScrollArea>
 
           {cartItems.length > 0 && (
-            <SheetFooter className="p-6 md:p-8 border-t bg-gradient-to-br from-muted/30 to-muted/50">
-              <div className="w-full space-y-6">
+            <SheetFooter className="p-6 md:p-6 border-t bg-gradient-to-br from-muted/30 to-muted/50">
+              <div className="w-full space-y-4">
                 {/* Price Breakdown */}
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <div className="flex justify-between text-base text-muted-foreground">
                     <span className="font-medium">Subtotal ({cartCount} items)</span>
                     <span className="font-bold">₹{subtotal.toLocaleString()}</span>
@@ -194,13 +191,22 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                       <Package className="w-4 h-4 text-primary" />
                       <span className="font-medium text-muted-foreground">Shipping</span>
                     </div>
-                    <span className="text-primary font-black text-lg">FREE</span>
+                    {shippingCost === 0 ? (
+                      <span className="text-primary font-black text-lg">FREE</span>
+                    ) : (
+                      <span className="font-bold text-muted-foreground">₹{shippingCost}</span>
+                    )}
                   </div>
+                  {subtotal < 499 && (
+                    <p className="text-xs text-muted-foreground italic">
+                      Add ₹{(499 - subtotal).toLocaleString()} more for free shipping!
+                    </p>
+                  )}
                   <Separator className="bg-border" />
                   <div className="flex justify-between items-center pt-2">
                     <span className="text-xl font-black text-foreground">Grand Total</span>
                     <span className="text-3xl font-black text-primary">
-                      ₹{subtotal.toLocaleString()}
+                      ₹{grandTotal.toLocaleString()}
                     </span>
                   </div>
                 </div>
@@ -214,9 +220,15 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                   <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
                 </Button>
 
-                <p className="text-xs text-center text-muted-foreground">
-                  Secure checkout • Free shipping on all orders
-                </p>
+                {subtotal >= 499 ? (
+                  <p className="text-xs text-center text-muted-foreground">
+                    Secure checkout • Free shipping applied
+                  </p>
+                ) : (
+                  <p className="text-xs text-center text-muted-foreground">
+                    Secure checkout • ₹50 shipping fee
+                  </p>
+                )}
               </div>
             </SheetFooter>
           )}

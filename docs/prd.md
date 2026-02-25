@@ -86,6 +86,7 @@ Each dynamically generated product card displays:
 **Cart Drawer:**
 - Opens as right sidebar drawer
 - Displays all added cart items with correct rendering
+- **Single close button only (remove duplicate close button)**
 - Close button to dismiss cart
 
 **Cart Item Features:**
@@ -95,11 +96,15 @@ Each dynamically generated product card displays:
 - Quantity increase/decrease controls
 - Remove item button
 - Individual item subtotal calculation and display
+- **Ensure all content visible and scrollable (fix visibility issue after ₹350)**
 
 **Cart Summary:**
 - Auto-calculated subtotal for all items
 - Cart item counter badge on navbar cart icon
 - Empty cart state message
+- **Reduced white space above Subtotal section**
+- **Free shipping display only when order total is above ₹499**
+- **Conditional shipping message: \"Free shipping on orders above ₹499\" or \"FREE\" based on cart total**
 
 **Data Persistence:**
 - Cart data saved in localStorage
@@ -110,27 +115,31 @@ Each dynamically generated product card displays:
 ### 2.8 Login System with OTP Verification
 
 **Login Modal:**
-- Opens when user clicks Checkout button
-- Mobile number and email input interface
+- Opens when user clicks Checkout button or Proceed to Checkout button
+- **Dual login option: Mobile number OR Email/Gmail**
 - Mobile number input field with +91 prefix
 - Email/Gmail input field
+- **User can choose to login with either mobile number or email**
 - Continue button to proceed
 - Close button to dismiss modal
 - Overlay background
 
 **OTP Verification Flow:**
-- User enters mobile number and email
-- System sends OTP to both mobile number and email
+- User enters mobile number OR email (not both required)
+- System sends OTP to the provided contact method (mobile or email)
 - OTP input field appears
 - User enters received OTP
-- System verifies OTP
+- **System verifies OTP correctly**
+- **Allow user to test login functionality**
 - Proceed to checkout upon successful verification
 
-**Email Notification for Login:**
-- Auto-generated email sent to provided Gmail/email address
-- Email contains OTP code
+**Email/SMS Notification for Login:**
+- Auto-generated OTP sent to provided mobile number (via SMS) or email address
+- Email/SMS contains OTP code
 - Email subject: Berrybooo Login OTP
-- Email includes OTP validity period
+- SMS message: Your Berrybooo login OTP is [CODE]
+- OTP validity period included
+- **OTP delivery must be functional and testable**
 
 **Login State Management:**
 - Save login state in localStorage
@@ -183,17 +192,18 @@ Each dynamically generated product card displays:
 - Click Pay Now button
 - Trigger respective payment gateway (frontend structure only)
 - Display payment confirmation UI
-- Send order confirmation email after successful payment
+- **Send order confirmation email with order ID after successful payment**
 
 ### 2.11 Order Confirmation Email System
 
 **Email Trigger:**
 - Auto-generated email sent immediately after order placement
-- Sent to the Gmail/email address provided during login
+- **Sent to the email address OR mobile number provided during login**
+- **Email delivery must be functional and working**
 
 **Email Content:**
 - Email subject: Order Confirmation - Berrybooo
-- Order number
+- **Unique Order ID/Order Number**
 - Order date and time
 - List of ordered items with quantities and prices
 - Total amount paid
@@ -203,8 +213,10 @@ Each dynamically generated product card displays:
 - Contact information for support
 
 **Email Delivery:**
-- Email must be sent successfully to the provided Gmail address
+- **Email must be successfully sent to the provided Gmail/email address**
+- **Order ID must be included in the email**
 - Confirmation message displayed on website after email is sent
+- **Email sending functionality must be testable and working**
 
 ### 2.12 Website Sections
 - Hero Slider Section
@@ -265,15 +277,16 @@ const categories = [
 - openProductModal()
 - addToCart()
 - updateCartUI()
-- renderCartItems() - Fixed to correctly display all cart products
+- renderCartItems() - Fixed to correctly display all cart products with proper scrolling
 - calculateCartTotal()
+- calculateShipping() - New function to determine free shipping eligibility
 - saveCartToLocalStorage()
 - loadCartFromLocalStorage()
 - initHeroSlider()
 - openLoginModal()
-- handleLogin()
-- sendOTPEmail()
-- verifyOTP()
+- handleLogin() - Updated to support mobile OR email login
+- sendOTP() - Updated to send OTP via SMS or email based on user input
+- verifyOTP() - Updated to correctly verify OTP
 - saveLoginState()
 - checkLoginStatus()
 - openCheckoutPage()
@@ -282,7 +295,8 @@ const categories = [
 - validateAddress()
 - selectPaymentMethod()
 - initRazorpayStructure()
-- sendOrderConfirmationEmail()
+- generateOrderID() - New function to create unique order ID
+- sendOrderConfirmationEmail() - Updated to include order ID and ensure email delivery
 
 **Critical Rules:**
 - No hardcoded product HTML in index.html
@@ -291,9 +305,12 @@ const categories = [
 - Dynamic injection of categories, product grids, and cards
 - All buttons fully functional
 - All interactive elements working
-- Cart rendering issue fixed
-- Login with OTP verification fully functional
-- Email sending functionality for OTP and order confirmation implemented
+- **Cart drawer: single close button, proper scrolling, reduced white space above subtotal**
+- **Free shipping only displayed when order total exceeds ₹499**
+- **Login with mobile number OR email, both with OTP verification**
+- **OTP sending and verification must be functional**
+- **Email sending functionality for OTP and order confirmation must work**
+- **Order ID must be generated and included in confirmation email**
 
 ### 3.4 Supabase Integration Readiness
 
@@ -313,7 +330,7 @@ const categories = [
 - Fully responsive across all device sizes
 - No layout breaking on any screen size
 - Hero slider responsive on all devices
-- Cart drawer responsive behavior
+- Cart drawer responsive behavior with proper scrolling
 - Modal responsive layout
 - Login modal responsive design
 - Checkout page responsive layout
@@ -345,7 +362,7 @@ const categories = [
 - Subtle shadows
 - Clean typography
 - Modern slider controls
-- Elegant cart drawer design
+- Elegant cart drawer design with optimized spacing
 - Professional modal overlay
 - Clean login modal design
 - Modern checkout page layout
@@ -354,7 +371,7 @@ const categories = [
 ## 5. Functional Requirements
 
 ### 5.1 Included Features
-- Add to Cart functionality (with fixed rendering)
+- Add to Cart functionality (with fixed rendering and scrolling)
 - Shopping cart management
 - Cart data persistence (localStorage)
 - Product modal view
@@ -363,23 +380,26 @@ const categories = [
 - Dynamic product expansion
 - Quantity controls
 - Cart subtotal calculation
-- Mobile number and email login system
-- OTP verification for login
-- OTP email notification
+- **Conditional free shipping display (only above ₹499)**
+- **Single close button in cart drawer**
+- **Reduced white space above subtotal**
+- **Mobile number OR email login system**
+- **OTP verification for both mobile and email login**
+- **Functional OTP sending via SMS/email**
+- **Testable login functionality**
 - Login state persistence
 - Checkout page with order summary
 - Coupon code application
 - Address input and validation
 - Payment methods selection UI (Razorpay, UPI, Card, Net Banking)
 - Razorpay integration structure
-- Order confirmation email notification
-- Email delivery to provided Gmail address
+- **Order ID generation**
+- **Order confirmation email notification with order ID**
+- **Functional email delivery to provided Gmail/email address**
 
 ### 5.2 Excluded Features
 The following features are NOT included:
 - Backend logic
-- Real OTP verification (frontend structure only)
-- Real payment processing
 - Server-side authentication
 - Database operations
 - Any server-side processing
@@ -388,14 +408,16 @@ The following features are NOT included:
 ### 5.3 Interaction Behaviors
 - View All: dynamically expand products using JavaScript, no page reload
 - View Details: open product modal overlay
-- Add to Cart: add item to cart, update counter badge, save to localStorage, render correctly in cart
-- Cart icon: open cart drawer with all items displayed
+- Add to Cart: add item to cart, update counter badge, save to localStorage, render correctly in cart with proper scrolling
+- Cart icon: open cart drawer with all items displayed and single close button
 - Checkout button: open login modal if not logged in
-- Login: enter mobile number and email, receive OTP via email, verify OTP, save login state, proceed to checkout page
+- **Login: enter mobile number OR email, receive OTP, verify OTP, save login state, proceed to checkout page**
+- **OTP verification: functional and testable**
 - Checkout page: display order summary, coupon input, address form
 - Continue button: proceed to payment methods
 - Payment selection: select payment method, trigger payment flow
-- Order placement: send order confirmation email to provided Gmail address
+- **Order placement: generate unique order ID, send order confirmation email with order ID to provided email address**
+- **Email delivery: functional and working**
 - Slider: auto-slide with manual controls
 - All CTA buttons: fully active and functional
 - Single Page Application behavior
@@ -403,29 +425,31 @@ The following features are NOT included:
 ## 6. Deliverables
 
 ### 6.1 Files to Deliver
-1. index.html - Complete HTML structure with empty containers, cart/modal elements, login modal with OTP fields, checkout page, payment section, and email notification structure
-2. styles.css - All styling including responsive design, cart drawer, modal, slider styles, login modal, checkout page, payment UI styles, and unique Berrybooo logo styling
-3. script.js - Dynamic rendering logic, fixed cart system, modal functionality, slider controls, login system with OTP verification, email sending functions for OTP and order confirmation, checkout flow, payment methods logic, and all interactions
+1. index.html - Complete HTML structure with empty containers, cart/modal elements with single close button, login modal with mobile OR email OTP fields, checkout page, payment section, and email notification structure
+2. styles.css - All styling including responsive design, cart drawer with optimized spacing, modal, slider styles, login modal, checkout page, payment UI styles, and unique Berrybooo logo styling
+3. script.js - Dynamic rendering logic, fixed cart system with proper scrolling and conditional free shipping, modal functionality, slider controls, login system with mobile OR email OTP verification, functional OTP sending, functional email sending for OTP and order confirmation with order ID, checkout flow, payment methods logic, and all interactions
 
 ### 6.2 Functionality Requirements
 - Website must run perfectly by opening index.html locally
 - Entire UI must be dynamic and future-proof for Supabase integration
 - All JavaScript must be fully functional without backend dependencies
-- Cart system fully operational with localStorage persistence and correct rendering
+- **Cart system: single close button, proper scrolling, reduced white space, conditional free shipping display**
 - Hero slider auto-playing with manual controls
 - All buttons and interactive elements working
 - Product modal functional
 - Smooth scrolling active on all navigation links
-- Login modal functional with OTP verification and email notification
-- OTP email sent to provided Gmail address during login
+- **Login modal: functional with mobile number OR email, OTP verification working and testable**
+- **OTP sending: functional via SMS/email**
+- **OTP verification: correctly validates entered OTP**
 - Checkout page fully functional with order summary, coupon, and address sections
-- Payment methods UI complete with Razorpay structure prepared (Cash on Delivery removed)
-- Order confirmation email sent automatically after order placement
-- Email successfully delivered to the Gmail address provided during login
+- Payment methods UI complete with Razorpay structure prepared
+- **Order ID generation: creates unique order number**
+- **Order confirmation email: functional, includes order ID, successfully delivered to Gmail/email address**
+- **Email sending: working and testable**
 - Single-page behavior maintained throughout
 - Unique Berrybooo logo displayed throughout the website
 
 ## 7. Reference Files
 
 ### 7.1 Uploaded Images
-1. Screenshot 2026-02-24 172432.png
+1. Screenshot 2026-02-25 230226.png - Cart drawer reference showing layout issues to be fixed

@@ -8,11 +8,22 @@ interface EmailConfig {
 }
 
 // EmailJS configuration - User needs to set these up
+// Get your credentials from https://www.emailjs.com/
 const EMAIL_CONFIG = {
-  SERVICE_ID: 'YOUR_EMAILJS_SERVICE_ID', // Replace with your EmailJS service ID
-  OTP_TEMPLATE_ID: 'YOUR_OTP_TEMPLATE_ID', // Replace with your OTP template ID
-  ORDER_TEMPLATE_ID: 'YOUR_ORDER_TEMPLATE_ID', // Replace with your order template ID
-  PUBLIC_KEY: 'YOUR_EMAILJS_PUBLIC_KEY', // Replace with your EmailJS public key
+  SERVICE_ID: 'service_YOUR_ID', // Replace with your EmailJS service ID
+  OTP_TEMPLATE_ID: 'template_YOUR_OTP_ID', // Replace with your OTP template ID
+  ORDER_TEMPLATE_ID: 'template_YOUR_ORDER_ID', // Replace with your order template ID
+  PUBLIC_KEY: 'YOUR_PUBLIC_KEY', // Replace with your EmailJS public key
+};
+
+// Check if EmailJS is configured
+const isEmailConfigured = () => {
+  return (
+    EMAIL_CONFIG.SERVICE_ID !== 'service_YOUR_ID' &&
+    EMAIL_CONFIG.OTP_TEMPLATE_ID !== 'template_YOUR_OTP_ID' &&
+    EMAIL_CONFIG.ORDER_TEMPLATE_ID !== 'template_YOUR_ORDER_ID' &&
+    EMAIL_CONFIG.PUBLIC_KEY !== 'YOUR_PUBLIC_KEY'
+  );
 };
 
 // Initialize EmailJS
@@ -29,12 +40,22 @@ export const sendOTPEmail = async (
   otp: string
 ): Promise<{ success: boolean; message: string }> => {
   try {
-    // Check if EmailJS is loaded
-    if (typeof window === 'undefined' || !(window as any).emailjs) {
-      console.warn('EmailJS not loaded. Email sending is disabled.');
+    // Check if EmailJS is configured
+    if (!isEmailConfigured()) {
+      console.warn('⚠️ EmailJS not configured. Please update credentials in src/utils/emailService.ts');
+      console.log('📧 Demo Mode - OTP:', otp);
       return {
         success: false,
-        message: 'Email service not configured. Please add EmailJS script to index.html',
+        message: 'Email service not configured. See EMAIL_SETUP.md for instructions.',
+      };
+    }
+
+    // Check if EmailJS is loaded
+    if (typeof window === 'undefined' || !(window as any).emailjs) {
+      console.error('❌ EmailJS SDK not loaded. Check if script is added to index.html');
+      return {
+        success: false,
+        message: 'Email service not loaded. Please refresh the page.',
       };
     }
 
@@ -48,21 +69,26 @@ export const sendOTPEmail = async (
       year: new Date().getFullYear(),
     };
 
+    console.log('📧 Sending OTP email to:', email);
+    
     await (window as any).emailjs.send(
       EMAIL_CONFIG.SERVICE_ID,
       EMAIL_CONFIG.OTP_TEMPLATE_ID,
       templateParams
     );
 
+    console.log('✅ OTP email sent successfully');
+    
     return {
       success: true,
       message: 'OTP sent successfully to your email',
     };
-  } catch (error) {
-    console.error('Error sending OTP email:', error);
+  } catch (error: any) {
+    console.error('❌ Error sending OTP email:', error);
+    console.log('📧 Demo Mode - OTP:', otp);
     return {
       success: false,
-      message: 'Failed to send OTP email. Please check your email configuration.',
+      message: error?.text || 'Failed to send email. Using demo mode.',
     };
   }
 };
@@ -82,12 +108,22 @@ export const sendOrderConfirmationEmail = async (
   }
 ): Promise<{ success: boolean; message: string }> => {
   try {
-    // Check if EmailJS is loaded
-    if (typeof window === 'undefined' || !(window as any).emailjs) {
-      console.warn('EmailJS not loaded. Email sending is disabled.');
+    // Check if EmailJS is configured
+    if (!isEmailConfigured()) {
+      console.warn('⚠️ EmailJS not configured. Order placed but email not sent.');
+      console.log('📦 Order ID:', orderDetails.orderId);
       return {
         success: false,
-        message: 'Email service not configured. Please add EmailJS script to index.html',
+        message: 'Email service not configured. Order placed successfully.',
+      };
+    }
+
+    // Check if EmailJS is loaded
+    if (typeof window === 'undefined' || !(window as any).emailjs) {
+      console.error('❌ EmailJS SDK not loaded');
+      return {
+        success: false,
+        message: 'Email service not loaded. Order placed successfully.',
       };
     }
 
@@ -115,21 +151,26 @@ export const sendOrderConfirmationEmail = async (
       year: new Date().getFullYear(),
     };
 
+    console.log('📧 Sending order confirmation to:', email);
+
     await (window as any).emailjs.send(
       EMAIL_CONFIG.SERVICE_ID,
       EMAIL_CONFIG.ORDER_TEMPLATE_ID,
       templateParams
     );
 
+    console.log('✅ Order confirmation email sent successfully');
+
     return {
       success: true,
       message: 'Order confirmation sent to your email',
     };
-  } catch (error) {
-    console.error('Error sending order confirmation email:', error);
+  } catch (error: any) {
+    console.error('❌ Error sending order confirmation email:', error);
+    console.log('📦 Order ID:', orderDetails.orderId);
     return {
       success: false,
-      message: 'Failed to send order confirmation email.',
+      message: error?.text || 'Order placed but email failed to send.',
     };
   }
 };
