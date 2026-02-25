@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Product } from '@/data/products';
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { Product } from '@/data/products';
 
 interface CartItem extends Product {
   quantity: number;

@@ -1,5 +1,5 @@
-import React from 'react';
 import { Quote, Star } from 'lucide-react';
+import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 
 export const Testimonials: React.FC = () => {

@@ -1,18 +1,19 @@
+import { BadgeCheck, Loader2, Lock, Mail, ShieldCheck } from 'lucide-react';
 import React, { useState } from 'react';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { ShieldCheck, Lock, BadgeCheck, Loader2, Mail } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContextCheckout';
-import { toast } from 'sonner';
 import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/contexts/AuthContextCheckout';
+import { generateOTP, sendOTPEmail } from '@/utils/emailService';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -23,7 +24,9 @@ interface LoginModalProps {
 export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
+  const [generatedOTP, setGeneratedOTP] = useState('');
   const [acceptUpdates, setAcceptUpdates] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
@@ -33,22 +36,48 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
       toast.error('Please enter a valid 10-digit mobile number');
       return;
     }
+
+    if (!email || !email.includes('@')) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
     
     setIsLoading(true);
     
-    // Simulate API call delay
-    setTimeout(() => {
-      setIsLoading(false);
-      toast.success(`OTP sent to +91 ${phoneNumber}`, {
-        description: 'Demo Mode: Use any 6-digit code to login'
+    // Generate OTP
+    const newOTP = generateOTP();
+    setGeneratedOTP(newOTP);
+    
+    // Send OTP to email
+    const emailResult = await sendOTPEmail(email, `+91${phoneNumber}`, newOTP);
+    
+    setIsLoading(false);
+    
+    if (emailResult.success) {
+      toast.success(`OTP sent to ${email}`, {
+        description: `Check your email for the 6-digit code. OTP: ${newOTP}`
       });
       setStep('otp');
-    }, 1500);
+    } else {
+      toast.error('Failed to send OTP', {
+        description: emailResult.message + ` Demo OTP: ${newOTP}`
+      });
+      // Still allow to proceed in demo mode
+      setStep('otp');
+    }
   };
 
   const handleVerifyOTP = async () => {
     if (otp.length !== 6) {
       toast.error('Please enter a valid 6-digit OTP');
+      return;
+    }
+
+    // Verify OTP matches
+    if (otp !== generatedOTP) {
+      toast.error('Invalid OTP', {
+        description: 'Please enter the correct OTP sent to your email'
+      });
       return;
     }
     
@@ -57,16 +86,19 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
     // Simulate API verification delay
     setTimeout(() => {
       setIsLoading(false);
-      login(`+91${phoneNumber}`);
+      // Store email in auth context
+      login(email);
       toast.success('Login successful! 🎉', {
-        description: 'Welcome to Plant Haven'
+        description: 'Welcome to BerryBooo'
       });
       onSuccess();
       onClose();
       // Reset state
       setStep('phone');
       setPhoneNumber('');
+      setEmail('');
       setOtp('');
+      setGeneratedOTP('');
     }, 1000);
   };
 
@@ -78,13 +110,14 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
       setIsLoading(false);
       login('google_user@gmail.com');
       toast.success('Google login successful! 🎉', {
-        description: 'Welcome to Plant Haven'
+        description: 'Welcome to BerryBooo'
       });
       onSuccess();
       onClose();
       // Reset state
       setStep('phone');
       setPhoneNumber('');
+      setEmail('');
       setOtp('');
     }, 1500);
   };
@@ -93,7 +126,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
     if (!isLoading) {
       setStep('phone');
       setPhoneNumber('');
+      setEmail('');
       setOtp('');
+      setGeneratedOTP('');
       onClose();
     }
   };
@@ -140,9 +175,31 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
                 </span>
               </div>
 
+              {/* Email Input */}
+              <div className="space-y-3">
+                <Label htmlFor="email" className="text-base font-bold">Email Address *</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="your.email@gmail.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="h-14 text-lg rounded-xl border-2 focus-visible:ring-primary"
+                  disabled={isLoading}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && email && phoneNumber.length === 10) {
+                      handleSendOTP();
+                    }
+                  }}
+                />
+                <p className="text-xs text-muted-foreground">
+                  OTP will be sent to this email address
+                </p>
+              </div>
+
               {/* Mobile Login */}
               <div className="space-y-3">
-                <Label htmlFor="phone" className="text-base font-bold">Enter Mobile Number</Label>
+                <Label htmlFor="phone" className="text-base font-bold">Mobile Number *</Label>
                 <div className="flex gap-2">
                   <div className="w-20 h-14 rounded-xl bg-muted flex items-center justify-center font-bold text-lg border-2 border-border">
                     +91
@@ -157,15 +214,12 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
                     maxLength={10}
                     disabled={isLoading}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter' && phoneNumber.length === 10) {
+                      if (e.key === 'Enter' && email && phoneNumber.length === 10) {
                         handleSendOTP();
                       }
                     }}
                   />
                 </div>
-                <p className="text-xs text-muted-foreground italic">
-                  Demo Mode: Any 10-digit number works
-                </p>
               </div>
 
               <div className="flex items-start gap-3">
@@ -177,14 +231,14 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
                   disabled={isLoading}
                 />
                 <label htmlFor="updates" className="text-sm text-muted-foreground leading-relaxed cursor-pointer">
-                  Send me order updates & offers - (no spam)
+                  Send me order updates & offers via email
                 </label>
               </div>
 
               <Button
                 onClick={handleSendOTP}
                 className="w-full h-14 rounded-xl text-lg font-black"
-                disabled={phoneNumber.length !== 10 || isLoading}
+                disabled={phoneNumber.length !== 10 || !email || isLoading}
               >
                 {isLoading ? (
                   <>
@@ -192,7 +246,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
                     Sending OTP...
                   </>
                 ) : (
-                  'Send OTP'
+                  'Send OTP to Email'
                 )}
               </Button>
             </>
@@ -201,7 +255,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
               <div className="space-y-3">
                 <Label htmlFor="otp" className="text-base font-bold">Enter OTP</Label>
                 <p className="text-sm text-muted-foreground">
-                  We've sent a 6-digit code to +91 {phoneNumber}
+                  We've sent a 6-digit code to {email}
                 </p>
                 <Input
                   id="otp"
@@ -219,8 +273,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
                     }
                   }}
                 />
-                <p className="text-xs text-muted-foreground italic text-center">
-                  Demo Mode: Enter any 6-digit code
+                <p className="text-xs text-primary font-bold text-center">
+                  Check your email inbox for the OTP
                 </p>
               </div>
 
@@ -230,11 +284,12 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
                   onClick={() => {
                     setStep('phone');
                     setOtp('');
+                    setGeneratedOTP('');
                   }}
                   className="flex-1 h-14 rounded-xl text-lg font-bold border-2"
                   disabled={isLoading}
                 >
-                  Change Number
+                  Change Email
                 </Button>
                 <Button
                   onClick={handleVerifyOTP}
@@ -281,7 +336,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
           </div>
 
           <p className="text-xs text-center text-muted-foreground">
-            By proceeding, I agree to Plant Haven's{' '}
+            By proceeding, I agree to BerryBooo's{' '}
             <a href="#" className="text-primary hover:underline font-bold">Privacy Policy</a>
             {' '}and{' '}
             <a href="#" className="text-primary hover:underline font-bold">T&C</a>

@@ -1,14 +1,14 @@
+import { BadgeCheck, Leaf, ShoppingCart, Truck } from 'lucide-react';
 import React from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Product } from '@/data/products';
 import { useCart } from '@/contexts/CartContext';
-import { BadgeCheck, Leaf, ShoppingCart, Truck } from 'lucide-react';
+import { Product } from '@/data/products';
 
 interface ProductModalProps {
   product: Product | null;

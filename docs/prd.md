@@ -1,18 +1,18 @@
-# Plant Selling Business Website Requirements Document
+# Berrybooo Plant Selling Business Website Requirements Document
 
 ## 1. Application Overview
 
 ### 1.1 Application Name
-Plant Haven
+Berrybooo
 
 ### 1.2 Application Description
-A modern, premium frontend website for a plant selling business, featuring grafted fruit saplings, flower plants, and indoor plants. The website is designed with a clean, minimal aesthetic inspired by kyari.co and ugaoo.com, built to be easily integrated with Supabase for future backend functionality. Enhanced with full ecommerce functionality including shopping cart system, promotional hero slider, login system, checkout flow, and payment integration structure.
+A modern, premium frontend website for a plant selling business, featuring grafted fruit saplings, flower plants, and indoor plants. The website is designed with a clean, minimal aesthetic inspired by kyari.co and ugaoo.com, built to be easily integrated with Supabase for future backend functionality. Enhanced with full ecommerce functionality including shopping cart system, promotional hero slider, login system with OTP verification, checkout flow, payment integration structure, and automated email notifications for OTP and order confirmation.
 
 ## 2. Core Features
 
 ### 2.1 Navigation System
 - Sticky navbar with smooth scroll behavior
-- Logo positioned on the left
+- Unique Berrybooo logo positioned on the left
 - Menu items: Fruit Saplings, Flower Plants, Indoor Plants, Garden Essentials, About, Contact
 - Cart icon with item counter badge in top-right corner
 - Cart button replacing previous Shop button
@@ -107,27 +107,41 @@ Each dynamically generated product card displays:
 - Cart state restored on page load
 - Fixed cart rendering issue to ensure all added products display correctly
 
-### 2.8 Login System
+### 2.8 Login System with OTP Verification
 
 **Login Modal:**
 - Opens when user clicks Checkout button
-- Mobile number login interface
-- Simple OTP/login UI (frontend only)
+- Mobile number and email input interface
 - Mobile number input field with +91 prefix
+- Email/Gmail input field
 - Continue button to proceed
 - Close button to dismiss modal
 - Overlay background
 
+**OTP Verification Flow:**
+- User enters mobile number and email
+- System sends OTP to both mobile number and email
+- OTP input field appears
+- User enters received OTP
+- System verifies OTP
+- Proceed to checkout upon successful verification
+
+**Email Notification for Login:**
+- Auto-generated email sent to provided Gmail/email address
+- Email contains OTP code
+- Email subject: Berrybooo Login OTP
+- Email includes OTP validity period
+
 **Login State Management:**
 - Save login state in localStorage
 - Persist login status across page refresh
-- Allow checkout only after successful login
+- Allow checkout only after successful OTP verification
 - Display user logged-in status
 
 ### 2.9 Checkout/Payment Page
 
 **Page Trigger:**
-- Opens after successful login
+- Opens after successful OTP verification
 - Replaces cart drawer view
 - Modern plant ecommerce checkout design
 
@@ -157,7 +171,6 @@ Each dynamically generated product card displays:
 - UPI payment option
 - Card payment option
 - Net Banking option
-- Cash on Delivery toggle option
 
 **Razorpay Integration Structure:**
 - Prepared structure for Razorpay integration
@@ -170,8 +183,30 @@ Each dynamically generated product card displays:
 - Click Pay Now button
 - Trigger respective payment gateway (frontend structure only)
 - Display payment confirmation UI
+- Send order confirmation email after successful payment
 
-### 2.11 Website Sections
+### 2.11 Order Confirmation Email System
+
+**Email Trigger:**
+- Auto-generated email sent immediately after order placement
+- Sent to the Gmail/email address provided during login
+
+**Email Content:**
+- Email subject: Order Confirmation - Berrybooo
+- Order number
+- Order date and time
+- List of ordered items with quantities and prices
+- Total amount paid
+- Delivery address
+- Payment method used
+- Estimated delivery date
+- Contact information for support
+
+**Email Delivery:**
+- Email must be sent successfully to the provided Gmail address
+- Confirmation message displayed on website after email is sent
+
+### 2.12 Website Sections
 - Hero Slider Section
 - Category Highlights
 - Fruit Saplings Section
@@ -182,7 +217,7 @@ Each dynamically generated product card displays:
 - Newsletter UI
 - Footer
 
-### 2.12 Animations and Interactions
+### 2.13 Animations and Interactions
 - Smooth scrolling throughout the site
 - Fade-in animations on scroll
 - Hover elevation effects on product cards
@@ -237,6 +272,8 @@ const categories = [
 - initHeroSlider()
 - openLoginModal()
 - handleLogin()
+- sendOTPEmail()
+- verifyOTP()
 - saveLoginState()
 - checkLoginStatus()
 - openCheckoutPage()
@@ -245,6 +282,7 @@ const categories = [
 - validateAddress()
 - selectPaymentMethod()
 - initRazorpayStructure()
+- sendOrderConfirmationEmail()
 
 **Critical Rules:**
 - No hardcoded product HTML in index.html
@@ -254,7 +292,8 @@ const categories = [
 - All buttons fully functional
 - All interactive elements working
 - Cart rendering issue fixed
-- Login and checkout flow fully functional
+- Login with OTP verification fully functional
+- Email sending functionality for OTP and order confirmation implemented
 
 ### 3.4 Supabase Integration Readiness
 
@@ -265,7 +304,9 @@ const categories = [
 - Avoid tightly coupled code
 - Cart system compatible with future backend integration
 - Login system ready for backend authentication integration
+- OTP verification ready for backend SMS/email service integration
 - Order and payment data structure ready for backend processing
+- Email notification system ready for backend email service integration
 
 ### 3.5 Responsive Design
 - Mobile-first approach
@@ -288,10 +329,17 @@ const categories = [
 - Kyari-style hero slider design
 - Modern checkout page design similar to reference image
 
-### 4.2 Color Palette
+### 4.2 Logo Design
+- Unique Berrybooo logo design
+- Modern and distinctive visual identity
+- Plant-themed elements incorporated
+- Clean and memorable design
+- Scalable for different screen sizes
+
+### 4.3 Color Palette
 - Soft green palette as primary color scheme
 
-### 4.3 Visual Elements
+### 4.4 Visual Elements
 - Rounded cards
 - Smooth hover animations
 - Subtle shadows
@@ -315,23 +363,27 @@ const categories = [
 - Dynamic product expansion
 - Quantity controls
 - Cart subtotal calculation
-- Mobile number login system
+- Mobile number and email login system
+- OTP verification for login
+- OTP email notification
 - Login state persistence
 - Checkout page with order summary
 - Coupon code application
 - Address input and validation
-- Payment methods selection UI
+- Payment methods selection UI (Razorpay, UPI, Card, Net Banking)
 - Razorpay integration structure
-- UPI, Card, Net Banking, COD options
+- Order confirmation email notification
+- Email delivery to provided Gmail address
 
 ### 5.2 Excluded Features
 The following features are NOT included:
 - Backend logic
-- Real OTP verification
+- Real OTP verification (frontend structure only)
 - Real payment processing
 - Server-side authentication
 - Database operations
 - Any server-side processing
+- Cash on Delivery option (removed)
 
 ### 5.3 Interaction Behaviors
 - View All: dynamically expand products using JavaScript, no page reload
@@ -339,10 +391,11 @@ The following features are NOT included:
 - Add to Cart: add item to cart, update counter badge, save to localStorage, render correctly in cart
 - Cart icon: open cart drawer with all items displayed
 - Checkout button: open login modal if not logged in
-- Login: save login state, proceed to checkout page
+- Login: enter mobile number and email, receive OTP via email, verify OTP, save login state, proceed to checkout page
 - Checkout page: display order summary, coupon input, address form
 - Continue button: proceed to payment methods
 - Payment selection: select payment method, trigger payment flow
+- Order placement: send order confirmation email to provided Gmail address
 - Slider: auto-slide with manual controls
 - All CTA buttons: fully active and functional
 - Single Page Application behavior
@@ -350,9 +403,9 @@ The following features are NOT included:
 ## 6. Deliverables
 
 ### 6.1 Files to Deliver
-1. index.html - Complete HTML structure with empty containers, cart/modal elements, login modal, checkout page, and payment section
-2. styles.css - All styling including responsive design, cart drawer, modal, slider styles, login modal, checkout page, and payment UI styles
-3. script.js - Dynamic rendering logic, fixed cart system, modal functionality, slider controls, login system, checkout flow, payment methods logic, and all interactions
+1. index.html - Complete HTML structure with empty containers, cart/modal elements, login modal with OTP fields, checkout page, payment section, and email notification structure
+2. styles.css - All styling including responsive design, cart drawer, modal, slider styles, login modal, checkout page, payment UI styles, and unique Berrybooo logo styling
+3. script.js - Dynamic rendering logic, fixed cart system, modal functionality, slider controls, login system with OTP verification, email sending functions for OTP and order confirmation, checkout flow, payment methods logic, and all interactions
 
 ### 6.2 Functionality Requirements
 - Website must run perfectly by opening index.html locally
@@ -363,10 +416,14 @@ The following features are NOT included:
 - All buttons and interactive elements working
 - Product modal functional
 - Smooth scrolling active on all navigation links
-- Login modal functional with state persistence
+- Login modal functional with OTP verification and email notification
+- OTP email sent to provided Gmail address during login
 - Checkout page fully functional with order summary, coupon, and address sections
-- Payment methods UI complete with Razorpay structure prepared
+- Payment methods UI complete with Razorpay structure prepared (Cash on Delivery removed)
+- Order confirmation email sent automatically after order placement
+- Email successfully delivered to the Gmail address provided during login
 - Single-page behavior maintained throughout
+- Unique Berrybooo logo displayed throughout the website
 
 ## 7. Reference Files
 

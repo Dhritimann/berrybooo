@@ -1,19 +1,19 @@
+import { Minus, Package, Plus, ShoppingBag, Trash2, X } from 'lucide-react';
 import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
 import {
   Sheet,
   SheetContent,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
-  SheetFooter,
 } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
-import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContextCheckout';
-import { Minus, Plus, ShoppingBag, Trash2, X, Package } from 'lucide-react';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
-import { LoginModal } from './LoginModal';
+import { useCart } from '@/contexts/CartContext';
 import { CheckoutPage } from './CheckoutPage';
+import { LoginModal } from './LoginModal';
 
 interface CartDrawerProps {
   isOpen: boolean;

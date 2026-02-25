@@ -1,4 +1,4 @@
-# Task: Build Plant Haven Landing Page
+# Task: Build BerryBooo Plant Ecommerce Platform
 
 ## Plan
 - [x] Initialize Project Structure & Design Tokens
@@ -32,7 +32,7 @@
   - [x] Fix cart rendering issues
   - [x] Add Login Modal with mobile OTP
   - [x] Create Checkout Page with order summary
-  - [x] Add Payment Methods (Razorpay, UPI, Card, Net Banking, COD)
+  - [x] Add Payment Methods (Razorpay, UPI, Card, Net Banking)
   - [x] Add Coupon system with discount calculation
   - [x] Add Address form
   - [x] Integrate authentication flow
@@ -43,17 +43,36 @@
   - [x] Enhance Cart UI with better visibility and layout
   - [x] Add item total calculations in cart
   - [x] Improve cart responsiveness and spacing
-  - [x] Add demo mode indicators for OTP login
+- [x] Rebranding & Email Integration
+  - [x] Rebrand from "Plant Haven" to "BerryBooo"
+  - [x] Create unique berry-themed logo (BerryBoooLogo component)
+  - [x] Update all branding across Navbar, Footer, and components
+  - [x] Remove Cash on Delivery payment option
+  - [x] Add email input field in login and checkout
+  - [x] Implement EmailJS integration for email sending
+  - [x] Add OTP email sending functionality
+  - [x] Add order confirmation email functionality
+  - [x] Add loading states for order placement
+  - [x] Clear cart after successful order
+  - [x] Create comprehensive EMAIL_SETUP.md documentation
 
 ## Notes
-- User requested "Vanilla JS" feel but the environment is React. I will use React with a clean architecture.
-- "View All" should expand products inline.
-- Soft green palette is primary.
-- Cart now properly displays all items with images, names, prices, and quantities
-- Login flow integrated with checkout - users must login before proceeding
-- Payment page includes all modern ecommerce features: coupons, address, payment methods
-- All data persists in localStorage (cart and auth state)
-- Razorpay integration structure ready for API key addition
-- Login modal now includes loading states, error handling, and Google login option
-- Cart UI significantly improved with better product visibility, clear pricing, and item totals
-- Demo mode clearly indicated for OTP verification (frontend-only implementation)
+- User requested "Vanilla JS" feel but the environment is React. Using React with clean architecture.
+- "View All" expands products inline without page reload.
+- Soft green palette is primary color scheme.
+- Cart properly displays all items with images, names, prices, quantities, and totals.
+- Login flow integrated with checkout - users must login before proceeding.
+- Payment page includes modern ecommerce features: coupons, address, payment methods.
+- All data persists in localStorage (cart and auth state).
+- Razorpay integration structure ready for API key addition.
+- Login modal includes loading states, error handling, and Google login option.
+- Cart UI significantly improved with better product visibility and clear pricing.
+- **Email functionality implemented using EmailJS**:
+  - OTP sent to email during login
+  - Order confirmation sent after placing order
+  - User must configure EmailJS credentials in `src/utils/emailService.ts`
+  - Detailed setup instructions in EMAIL_SETUP.md
+- **Branding updated to BerryBooo** with custom berry cluster logo
+- Cash on Delivery option removed as requested
+- Email field added to both login and checkout forms
+- Order placement now sends confirmation email with order details

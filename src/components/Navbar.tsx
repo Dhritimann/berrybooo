@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Menu, X, Leaf, ShoppingBag } from 'lucide-react';
+import { Menu, ShoppingBag, X } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 import { useCart } from '@/contexts/CartContext';
+import { cn } from '@/lib/utils';
+import { BerryBoooLogo } from './BerryBoooLogo';
 
 interface NavbarProps {
   onCartOpen: () => void;
@@ -62,8 +63,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
         >
-          <Leaf className="w-8 h-8" />
-          <span>Plant Haven</span>
+          <BerryBoooLogo className="w-10 h-10" />
+          <span>BerryBooo</span>
         </a>
 
         {/* Desktop Menu */}

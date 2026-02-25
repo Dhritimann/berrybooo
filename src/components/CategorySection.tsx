@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { Category, Product } from '@/data/products';
-import { ProductCard } from './ProductCard';
-import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Category, Product } from '@/data/products';
 import { cn } from '@/lib/utils';
+import { ProductCard } from './ProductCard';
 
 interface CategorySectionProps {
   category: Category;

@@ -1,40 +1,43 @@
+import { 
+  ArrowLeft, 
+  BadgeCheck,
+  Building2,
+  ChevronRight,
+  CreditCard, 
+  Loader2, 
+  MapPin, 
+  Smartphone,
+  Tag, 
+  Wallet
+} from 'lucide-react';
 import React, { useState } from 'react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
-import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContextCheckout';
-import { 
-  ArrowLeft, 
-  Tag, 
-  MapPin, 
-  CreditCard, 
-  Smartphone,
-  Building2,
-  Wallet,
-  BadgeCheck,
-  ChevronRight,
-  X
-} from 'lucide-react';
-import { toast } from 'sonner';
+import { useCart } from '@/contexts/CartContext';
 import { cn } from '@/lib/utils';
+import { generateOrderId, sendOrderConfirmationEmail } from '@/utils/emailService';
 
 interface CheckoutPageProps {
   onClose: () => void;
 }
 
 export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onClose }) => {
-  const { cartItems, subtotal } = useCart();
+  const { cartItems, subtotal, clearCart } = useCart();
   const { phoneNumber } = useAuth();
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [discount, setDiscount] = useState(0);
-  const [paymentMethod, setPaymentMethod] = useState<'razorpay' | 'upi' | 'card' | 'netbanking' | 'cod'>('razorpay');
+  const [paymentMethod, setPaymentMethod] = useState<'razorpay' | 'upi' | 'card' | 'netbanking'>('razorpay');
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [address, setAddress] = useState({
     name: '',
+    email: '',
     phone: phoneNumber || '',
     pincode: '',
     address: '',
@@ -69,17 +72,66 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onClose }) => {
     toast.info('Coupon removed');
   };
 
-  const handlePlaceOrder = () => {
-    if (!address.name || !address.phone || !address.pincode || !address.address || !address.city || !address.state) {
-      toast.error('Please fill in all address details');
+  const handlePlaceOrder = async () => {
+    if (!address.name || !address.email || !address.phone || !address.pincode || !address.address || !address.city || !address.state) {
+      toast.error('Please fill in all required fields');
       return;
     }
 
-    // Frontend only - simulate order placement
-    toast.success('Order placed successfully! 🎉');
-    setTimeout(() => {
-      onClose();
-    }, 2000);
+    if (!address.email.includes('@')) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+
+    setIsPlacingOrder(true);
+
+    // Generate order ID
+    const orderId = generateOrderId();
+
+    // Prepare order details
+    const orderDetails = {
+      orderId,
+      customerName: address.name,
+      items: cartItems.map(item => ({
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price
+      })),
+      subtotal,
+      discount,
+      total: finalTotal,
+      address: `${address.address}, ${address.city}, ${address.state} - ${address.pincode}`,
+      phoneNumber: address.phone
+    };
+
+    // Send order confirmation email
+    const emailResult = await sendOrderConfirmationEmail(address.email, orderDetails);
+
+    setIsPlacingOrder(false);
+
+    if (emailResult.success) {
+      toast.success('Order placed successfully! 🎉', {
+        description: `Order confirmation sent to ${address.email}. Order ID: ${orderId}`
+      });
+      
+      // Clear cart after successful order
+      clearCart();
+      
+      setTimeout(() => {
+        onClose();
+      }, 3000);
+    } else {
+      toast.success('Order placed successfully! 🎉', {
+        description: `Order ID: ${orderId}. ${emailResult.message}`
+      });
+      
+      // Still clear cart even if email fails
+      clearCart();
+      
+      setTimeout(() => {
+        onClose();
+      }, 3000);
+    }
   };
 
   const finalTotal = subtotal - discount;
@@ -200,6 +252,20 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onClose }) => {
                       />
                     </div>
                     <div className="space-y-2">
+                      <Label htmlFor="email">Email Address *</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={address.email}
+                        onChange={(e) => setAddress({ ...address, email: e.target.value })}
+                        className="h-12 rounded-xl border-2"
+                        placeholder="your.email@gmail.com"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
                       <Label htmlFor="phone">Phone Number *</Label>
                       <Input
                         id="phone"
@@ -207,6 +273,17 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onClose }) => {
                         onChange={(e) => setAddress({ ...address, phone: e.target.value })}
                         className="h-12 rounded-xl border-2"
                         placeholder="+91 9876543210"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="pincode">Pincode *</Label>
+                      <Input
+                        id="pincode"
+                        value={address.pincode}
+                        onChange={(e) => setAddress({ ...address, pincode: e.target.value })}
+                        className="h-12 rounded-xl border-2"
+                        placeholder="400001"
+                        maxLength={6}
                       />
                     </div>
                   </div>
@@ -222,18 +299,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onClose }) => {
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="pincode">Pincode *</Label>
-                      <Input
-                        id="pincode"
-                        value={address.pincode}
-                        onChange={(e) => setAddress({ ...address, pincode: e.target.value })}
-                        className="h-12 rounded-xl border-2"
-                        placeholder="400001"
-                        maxLength={6}
-                      />
-                    </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="city">City *</Label>
                       <Input
@@ -339,24 +405,6 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onClose }) => {
                         </div>
                       </div>
                     </label>
-
-                    <label
-                      className={cn(
-                        "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
-                        paymentMethod === 'cod' ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
-                      )}
-                    >
-                      <RadioGroupItem value="cod" id="cod" />
-                      <div className="flex items-center gap-3 flex-1">
-                        <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                          <Wallet className="w-6 h-6 text-primary" />
-                        </div>
-                        <div>
-                          <p className="font-bold">Cash on Delivery</p>
-                          <p className="text-sm text-muted-foreground">Pay when you receive</p>
-                        </div>
-                      </div>
-                    </label>
                   </div>
                 </RadioGroup>
               </div>
@@ -414,12 +462,20 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onClose }) => {
                 <Button
                   onClick={handlePlaceOrder}
                   className="w-full h-14 rounded-xl text-lg font-black shadow-xl"
+                  disabled={isPlacingOrder}
                 >
-                  Place Order
+                  {isPlacingOrder ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Processing Order...
+                    </>
+                  ) : (
+                    'Place Order'
+                  )}
                 </Button>
 
                 <p className="text-xs text-center text-muted-foreground">
-                  By placing order, you agree to our Terms & Conditions
+                  By placing order, you agree to our Terms & Conditions. Order confirmation will be sent to your email.
                 </p>
               </div>
             </div>

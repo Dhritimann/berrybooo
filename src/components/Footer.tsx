@@ -1,5 +1,6 @@
+import { Facebook, Instagram, Mail, MapPin, Phone, Twitter } from 'lucide-react';
 import React from 'react';
-import { Facebook, Instagram, Leaf, MapPin, Phone, Mail, Twitter } from 'lucide-react';
+import { BerryBoooLogo } from './BerryBoooLogo';
 
 export const Footer: React.FC = () => {
   return (
@@ -9,8 +10,8 @@ export const Footer: React.FC = () => {
           {/* Brand */}
           <div className="space-y-6">
             <div className="flex items-center gap-2 font-bold text-2xl text-primary">
-              <Leaf className="w-8 h-8" />
-              <span>Plant Haven</span>
+              <BerryBoooLogo className="w-10 h-10" />
+              <span>BerryBooo</span>
             </div>
             <p className="text-muted-foreground leading-relaxed">
               Bringing nature closer to you. Premium quality plants for your home and garden.
@@ -72,7 +73,7 @@ export const Footer: React.FC = () => {
         </div>
 
         <div className="border-t mt-16 pt-8 text-center text-muted-foreground text-sm flex flex-col md:flex-row justify-between items-center gap-4">
-          <p>© 2026 Plant Haven. All rights reserved.</p>
+          <p>© 2026 BerryBooo. All rights reserved.</p>
           <div className="flex gap-8">
             <a href="#" className="hover:text-primary transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-primary transition-colors">Terms of Service</a>

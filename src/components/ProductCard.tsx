@@ -1,9 +1,9 @@
+import { Eye, ShoppingCart } from 'lucide-react';
 import React from 'react';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Product } from '@/data/products';
-import { ShoppingCart, Eye } from 'lucide-react';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { useCart } from '@/contexts/CartContext';
+import { Product } from '@/data/products';
 
 interface ProductCardProps {
   product: Product;

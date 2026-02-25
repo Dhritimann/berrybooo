@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import Autoplay from 'embla-carousel-autoplay';
+import { ArrowRight, Leaf, Sparkles, Tag } from 'lucide-react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Carousel,
+  type CarouselApi,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-  type CarouselApi,
 } from '@/components/ui/carousel';
-import Autoplay from 'embla-carousel-autoplay';
-import { Button } from '@/components/ui/button';
-import { ArrowRight, Leaf, Sparkles, Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const slides = [

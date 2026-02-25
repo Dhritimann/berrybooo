@@ -1,7 +1,7 @@
+import { Leaf, Send } from 'lucide-react';
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Leaf, Send } from 'lucide-react';
 
 export const Newsletter: React.FC = () => {
   return (

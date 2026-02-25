@@ -1,5 +1,5 @@
-import React from 'react';
 import { BadgeCheck, Leaf, Sparkles, Sprout } from 'lucide-react';
+import React from 'react';
 
 export const WhyChooseUs: React.FC = () => {
   const features = [

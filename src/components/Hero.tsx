@@ -1,6 +1,6 @@
+import { ArrowRight, Leaf, ShieldCheck, Truck } from 'lucide-react';
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Leaf, ShieldCheck, Truck } from 'lucide-react';
 
 export const Hero: React.FC = () => {
   return (
