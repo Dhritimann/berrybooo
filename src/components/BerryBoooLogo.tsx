@@ -8,82 +8,46 @@ export const BerryBoooLogo: React.FC<{ className?: string }> = ({ className = "w
       xmlns="http://www.w3.org/2000/svg"
       className={className}
     >
-      {/* Berry cluster */}
-      <g>
-        {/* Main berry */}
-        <circle cx="50" cy="55" r="22" fill="url(#berry-gradient-1)" />
-        <circle cx="50" cy="55" r="22" fill="url(#berry-shine)" opacity="0.3" />
-        
-        {/* Left berry */}
-        <circle cx="32" cy="58" r="16" fill="url(#berry-gradient-2)" />
-        <circle cx="32" cy="58" r="16" fill="url(#berry-shine)" opacity="0.2" />
-        
-        {/* Right berry */}
-        <circle cx="68" cy="58" r="16" fill="url(#berry-gradient-3)" />
-        <circle cx="68" cy="58" r="16" fill="url(#berry-shine)" opacity="0.2" />
-        
-        {/* Top berry */}
-        <circle cx="50" cy="35" r="14" fill="url(#berry-gradient-1)" />
-        <circle cx="50" cy="35" r="14" fill="url(#berry-shine)" opacity="0.25" />
-        
-        {/* Leaves */}
-        <path
-          d="M 45 25 Q 40 15 35 20 Q 38 25 45 28 Z"
-          fill="url(#leaf-gradient)"
-        />
-        <path
-          d="M 55 25 Q 60 15 65 20 Q 62 25 55 28 Z"
-          fill="url(#leaf-gradient)"
-        />
-        <path
-          d="M 50 22 Q 50 10 50 15 Q 50 20 50 25 Z"
-          fill="url(#leaf-gradient)"
-        />
-        
-        {/* Berry seeds/dots */}
-        <circle cx="48" cy="52" r="1.5" fill="#8B4513" opacity="0.6" />
-        <circle cx="52" cy="54" r="1.5" fill="#8B4513" opacity="0.6" />
-        <circle cx="50" cy="58" r="1.5" fill="#8B4513" opacity="0.6" />
-        <circle cx="46" cy="56" r="1.5" fill="#8B4513" opacity="0.6" />
-        <circle cx="54" cy="57" r="1.5" fill="#8B4513" opacity="0.6" />
-        
-        <circle cx="30" cy="56" r="1.2" fill="#8B4513" opacity="0.5" />
-        <circle cx="34" cy="59" r="1.2" fill="#8B4513" opacity="0.5" />
-        
-        <circle cx="66" cy="56" r="1.2" fill="#8B4513" opacity="0.5" />
-        <circle cx="70" cy="59" r="1.2" fill="#8B4513" opacity="0.5" />
-        
-        <circle cx="48" cy="34" r="1" fill="#8B4513" opacity="0.5" />
-        <circle cx="52" cy="36" r="1" fill="#8B4513" opacity="0.5" />
-      </g>
-      
-      {/* Gradients */}
+      {/* Minimal Premium Organic Logo */}
       <defs>
-        <radialGradient id="berry-gradient-1" cx="0.3" cy="0.3" r="0.8">
-          <stop offset="0%" stopColor="#E63946" />
-          <stop offset="100%" stopColor="#A4133C" />
-        </radialGradient>
-        
-        <radialGradient id="berry-gradient-2" cx="0.3" cy="0.3" r="0.8">
-          <stop offset="0%" stopColor="#F72585" />
-          <stop offset="100%" stopColor="#B5179E" />
-        </radialGradient>
-        
-        <radialGradient id="berry-gradient-3" cx="0.3" cy="0.3" r="0.8">
-          <stop offset="0%" stopColor="#7209B7" />
-          <stop offset="100%" stopColor="#560BAD" />
-        </radialGradient>
-        
-        <linearGradient id="leaf-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#52B788" />
-          <stop offset="100%" stopColor="#2D6A4F" />
+        <linearGradient id="berry-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="hsl(var(--primary))" />
+          <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.8" />
         </linearGradient>
-        
-        <radialGradient id="berry-shine" cx="0.3" cy="0.3" r="0.5">
-          <stop offset="0%" stopColor="#FFFFFF" />
-          <stop offset="100%" stopColor="#FFFFFF" opacity="0" />
-        </radialGradient>
+        <filter id="soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="2" />
+          <feOffset dx="1" dy="1" result="offsetblur" />
+          <feComponentTransfer>
+            <feFuncA type="linear" slope="0.2" />
+          </feComponentTransfer>
+          <feMerge>
+            <feMergeNode />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
       </defs>
+
+      {/* Main Berry Shape - Sophisticated organic curve */}
+      <path
+        d="M50 85C70 85 82 68 82 48C82 28 70 15 50 15C30 15 18 28 18 48C18 68 30 85 50 85Z"
+        fill="url(#berry-grad)"
+        filter="url(#soft-shadow)"
+      />
+
+      {/* Minimal Leaf - Single elegant stroke */}
+      <path
+        d="M50 22C50 22 52 5 65 5C65 5 55 7 50 22Z"
+        fill="#22C55E"
+      />
+      
+      {/* Premium Shine - Subtle accent */}
+      <path
+        d="M35 35C38 32 42 30 46 30"
+        stroke="white"
+        strokeWidth="3"
+        strokeLinecap="round"
+        opacity="0.2"
+      />
     </svg>
   );
 };

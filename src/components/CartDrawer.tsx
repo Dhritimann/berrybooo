@@ -99,126 +99,128 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
               </div>
             ) : (
               <ScrollArea className="flex-1 p-6 md:p-8">
-                <div className="space-y-6">
-                  {cartItems.map((item, index) => (
-                    <div 
-                      key={item.id} 
-                      className="bg-card rounded-2xl p-4 border-2 border-border hover:border-primary/30 transition-all duration-300 animate-fade-in"
-                      style={{ animationDelay: `${index * 0.1}s` }}
-                    >
-                      <div className="flex gap-4">
-                        {/* Product Image */}
-                        <div className="w-24 h-24 md:w-28 md:h-28 rounded-xl overflow-hidden bg-muted shrink-0 shadow-md border-2 border-border">
-                          <img 
-                            src={item.image} 
-                            alt={item.name} 
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                          />
-                        </div>
-                        
-                        {/* Product Details */}
-                        <div className="flex-1 flex flex-col justify-between min-w-0">
-                          <div className="flex justify-between gap-3">
-                            <div className="flex-1 min-w-0">
-                              <h4 className="font-black text-base md:text-lg leading-tight text-foreground line-clamp-1">
-                                {item.name}
-                              </h4>
-                              <p className="text-xs md:text-sm text-muted-foreground mt-1 line-clamp-1">
-                                {item.subtitle}
-                              </p>
-                              <div className="mt-2 flex items-center gap-2">
-                                <span className="text-lg md:text-xl font-black text-primary">
-                                  {item.price}
-                                </span>
-                                <span className="text-xs text-muted-foreground">per unit</span>
-                              </div>
-                            </div>
-                            <button 
-                              onClick={() => removeFromCart(item.id)}
-                              className="p-2 h-fit hover:bg-destructive/10 rounded-lg transition-colors group"
-                              aria-label="Remove item"
-                            >
-                              <Trash2 className="w-5 h-5 text-muted-foreground group-hover:text-destructive transition-colors" />
-                            </button>
+                <div className="space-y-8 pb-8">
+                  <div className="space-y-6">
+                    {cartItems.map((item, index) => (
+                      <div 
+                        key={item.id} 
+                        className="bg-card rounded-2xl p-4 border-2 border-border hover:border-primary/30 transition-all duration-300 animate-fade-in"
+                        style={{ animationDelay: `${index * 0.1}s` }}
+                      >
+                        <div className="flex gap-4">
+                          {/* Product Image */}
+                          <div className="w-24 h-24 md:w-28 md:h-28 rounded-xl overflow-hidden bg-muted shrink-0 shadow-md border-2 border-border">
+                            <img 
+                              src={item.image} 
+                              alt={item.name} 
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                            />
                           </div>
                           
-                          {/* Quantity Controls & Total */}
-                          <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
-                            <div className="flex items-center gap-2 bg-muted rounded-xl p-1 border border-border">
-                              <Button 
-                                variant="ghost" 
-                                size="icon" 
-                                className="w-8 h-8 rounded-lg hover:bg-white hover:text-primary"
-                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                disabled={item.quantity <= 1}
-                                aria-label="Decrease quantity"
+                          {/* Product Details */}
+                          <div className="flex-1 flex flex-col justify-between min-w-0">
+                            <div className="flex justify-between gap-3">
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-black text-base md:text-lg leading-tight text-foreground line-clamp-1">
+                                  {item.name}
+                                </h4>
+                                <p className="text-xs md:text-sm text-muted-foreground mt-1 line-clamp-1">
+                                  {item.subtitle}
+                                </p>
+                                <div className="mt-2 flex items-center gap-2">
+                                  <span className="text-lg md:text-xl font-black text-primary">
+                                    {item.price}
+                                  </span>
+                                  <span className="text-xs text-muted-foreground">per unit</span>
+                                </div>
+                              </div>
+                              <button 
+                                onClick={() => removeFromCart(item.id)}
+                                className="p-2 h-fit hover:bg-destructive/10 rounded-lg transition-colors group"
+                                aria-label="Remove item"
                               >
-                                <Minus className="w-4 h-4" />
-                              </Button>
-                              <span className="w-8 text-center font-black text-foreground">
-                                {item.quantity}
-                              </span>
-                              <Button 
-                                variant="ghost" 
-                                size="icon" 
-                                className="w-8 h-8 rounded-lg hover:bg-white hover:text-primary"
-                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                aria-label="Increase quantity"
-                              >
-                                <Plus className="w-4 h-4" />
-                              </Button>
+                                <Trash2 className="w-5 h-5 text-muted-foreground group-hover:text-destructive transition-colors" />
+                              </button>
                             </div>
-                            <div className="text-right">
-                              <p className="text-xs text-muted-foreground">Item Total</p>
-                              <p className="text-lg md:text-xl font-black text-primary">
-                                ₹{getItemTotal(item.price, item.quantity).toLocaleString()}
-                              </p>
+                            
+                            {/* Quantity Controls & Total */}
+                            <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
+                              <div className="flex items-center gap-2 bg-muted rounded-xl p-1 border border-border">
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="w-8 h-8 rounded-lg hover:bg-white hover:text-primary"
+                                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                  disabled={item.quantity <= 1}
+                                  aria-label="Decrease quantity"
+                                >
+                                  <Minus className="w-4 h-4" />
+                                </Button>
+                                <span className="w-8 text-center font-black text-foreground">
+                                  {item.quantity}
+                                </span>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="w-8 h-8 rounded-lg hover:bg-white hover:text-primary"
+                                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                  aria-label="Increase quantity"
+                                >
+                                  <Plus className="w-4 h-4" />
+                                </Button>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-xs text-muted-foreground">Item Total</p>
+                                <p className="text-lg md:text-xl font-black text-primary">
+                                  ₹{getItemTotal(item.price, item.quantity).toLocaleString()}
+                                </p>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
+                    ))}
+                  </div>
+
+                  {/* Price Breakdown - Now inside ScrollArea to avoid gap */}
+                  <div className="space-y-4 pt-6 border-t border-dashed border-border">
+                    <div className="flex justify-between text-base text-muted-foreground">
+                      <span className="font-medium">Subtotal ({cartCount} items)</span>
+                      <span className="font-bold">₹{subtotal.toLocaleString()}</span>
                     </div>
-                  ))}
+                    <div className="flex justify-between text-base">
+                      <div className="flex items-center gap-2">
+                        <Package className="w-4 h-4 text-primary" />
+                        <span className="font-medium text-muted-foreground">Shipping</span>
+                      </div>
+                      {shippingCost === 0 ? (
+                        <span className="text-primary font-black text-lg">FREE</span>
+                      ) : (
+                        <span className="font-bold text-muted-foreground">₹{shippingCost}</span>
+                      )}
+                    </div>
+                    {subtotal < 499 && (
+                      <p className="text-xs text-muted-foreground italic">
+                        Add ₹{(499 - subtotal).toLocaleString()} more for free shipping!
+                      </p>
+                    )}
+                    <Separator className="bg-border" />
+                    <div className="flex justify-between items-center pt-2">
+                      <span className="text-xl font-black text-foreground">Grand Total</span>
+                      <span className="text-3xl font-black text-primary">
+                        ₹{grandTotal.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </ScrollArea>
             )}
           </div>
 
           {cartItems.length > 0 && (
-            <SheetFooter className="p-6 md:p-6 border-t bg-gradient-to-br from-muted/30 to-muted/50">
+            <SheetFooter className="p-6 border-t bg-gradient-to-br from-muted/30 to-muted/50 shrink-0">
               <div className="w-full space-y-4">
-                {/* Price Breakdown */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-base text-muted-foreground">
-                    <span className="font-medium">Subtotal ({cartCount} items)</span>
-                    <span className="font-bold">₹{subtotal.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between text-base">
-                    <div className="flex items-center gap-2">
-                      <Package className="w-4 h-4 text-primary" />
-                      <span className="font-medium text-muted-foreground">Shipping</span>
-                    </div>
-                    {shippingCost === 0 ? (
-                      <span className="text-primary font-black text-lg">FREE</span>
-                    ) : (
-                      <span className="font-bold text-muted-foreground">₹{shippingCost}</span>
-                    )}
-                  </div>
-                  {subtotal < 499 && (
-                    <p className="text-xs text-muted-foreground italic">
-                      Add ₹{(499 - subtotal).toLocaleString()} more for free shipping!
-                    </p>
-                  )}
-                  <Separator className="bg-border" />
-                  <div className="flex justify-between items-center pt-2">
-                    <span className="text-xl font-black text-foreground">Grand Total</span>
-                    <span className="text-3xl font-black text-primary">
-                      ₹{grandTotal.toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-
                 {/* Checkout Button */}
                 <Button 
                   onClick={handleCheckout}
