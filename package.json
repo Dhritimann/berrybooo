@@ -2,6 +2,7 @@
   "name": "miaoda-react-admin",
   "version": "0.0.1",
   "type": "module",
+  
   "scripts": {
     "dev": "vite",
     "build": "echo 'Do not use this command, only use lint to check'",
